@@ -5,10 +5,12 @@ import logging
 import imghdr
 import upyun
 from celery import Celery
-
-BUCKETNAME = os.environ['BUCKETNAME']
-UPYUN_USERNAME = os.environ['UPYUN_USERNAME']
-UPYUN_PASSWORD = os.environ['UPYUN_PASSWORD']
+try:
+    from config import *
+except ImportError:
+    BUCKETNAME = os.environ['BUCKETNAME']
+    UPYUN_USERNAME = os.environ['UPYUN_USERNAME']
+    UPYUN_PASSWORD = os.environ['UPYUN_PASSWORD']
 
 SUCCESS = "SUCCESS"
 NOT_EXIST = "NOT_EXIST"
@@ -33,7 +35,9 @@ def log_ce(ce):
     logging.error(error_msg)
 
 
-celery = Celery("tasks", broker='redis://localhost:6379/0')
+# celery = Celery("tasks", broker='redis://localhost:6379/0')
+celery = Celery("simple_task", broker="amqp://guest:guest@localhost:5672")
+celery.conf.CELERY_RESULT_BACKEND = "amqp"
 
 up = upyun.UpYun(BUCKETNAME, UPYUN_USERNAME, UPYUN_PASSWORD, timeout=30,
                  endpoint=upyun.ED_AUTO)

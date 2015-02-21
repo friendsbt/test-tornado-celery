@@ -1,2 +1,2 @@
 #!/bin/bash
-celery -A task_simple worker --loglevel=info
+celery -A tasks worker --loglevel=info
